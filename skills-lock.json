@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "telegram-bot-builder": {
+      "source": "davila7/claude-code-templates",
+      "sourceType": "github",
+      "skillPath": "cli-tool/components/skills/enterprise-communication/telegram-bot-builder/SKILL.md",
+      "computedHash": "0443dbe20b2af93f86638c82c087d9040990ff7b688d26a25656530a80b76097"
+    }
+  }
+}
