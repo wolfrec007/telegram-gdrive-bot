@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Build Telegram Local Bot API Server
-RUN git clone --depth 1 https://github.com/tdlib/telegram-bot-api.git /opt/telegram-bot-api \
+RUN git clone --recursive --depth 1 https://github.com/tdlib/telegram-bot-api.git /opt/telegram-bot-api \
     && cd /opt/telegram-bot-api \
     && mkdir build \
     && cd build \
