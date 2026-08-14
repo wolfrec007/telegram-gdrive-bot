@@ -336,9 +336,14 @@ def main():
     builder = Application.builder().token(config.BOT_TOKEN)
 
     if config.LOCAL_API_URL:
-        builder = builder.base_url(f"{config.LOCAL_API_URL}/bot")
-        builder = builder.base_file_url(f"{config.LOCAL_API_URL}/file/bot")
-        log.info(f"Using Local Bot API: {config.LOCAL_API_URL}")
+        try:
+            import urllib.request
+            urllib.request.urlopen(f"{config.LOCAL_API_URL}/bot{config.BOT_TOKEN}/getMe", timeout=5)
+            builder = builder.base_url(f"{config.LOCAL_API_URL}/bot")
+            builder = builder.base_file_url(f"{config.LOCAL_API_URL}/file/bot")
+            log.info(f"Using Local Bot API: {config.LOCAL_API_URL}")
+        except Exception as e:
+            log.warning(f"Local Bot API at {config.LOCAL_API_URL} not ready ({e}), using official Telegram API")
 
     app = builder.build()
 

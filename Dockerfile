@@ -4,6 +4,7 @@ FROM python:3.12-slim
 RUN apt-get update && apt-get install -y \
     cmake g++ git libssl-dev zlib1g-dev \
     libreadline-dev libncurses5-dev gperf \
+    supervisor curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Build Telegram Local Bot API Server
@@ -15,9 +16,6 @@ RUN git clone --recursive --depth 1 https://github.com/tdlib/telegram-bot-api.gi
     && cmake --build . --target telegram-bot-api -j$(nproc) \
     && mv telegram-bot-api /usr/local/bin/ \
     && rm -rf /opt/telegram-bot-api
-
-# Install supervisord to manage both processes
-RUN apt-get update && apt-get install -y supervisor && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -33,6 +31,8 @@ RUN mkdir -p downloads
 
 # Copy supervisord config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
+COPY start.sh /app/start.sh
+RUN chmod +x /app/start.sh
 
 EXPOSE 3000 8081
 
