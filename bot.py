@@ -250,14 +250,21 @@ async def on_document(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await handle_file(update, ctx, update.message.document)
 
 
-async def handle_file(update: Update, ctx: ContextTypes.DEFAULT_TYPE, file_obj):
-    msg = await update.message.reply_text("Downloading...")
+MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB Telegram Bot API limit
 
+
+async def handle_file(update: Update, ctx: ContextTypes.DEFAULT_TYPE, file_obj):
     file_id = file_obj.file_id
     file_name = getattr(file_obj, "file_name", None) or f"file_{file_id[:8]}"
     mime_type = getattr(file_obj, "mime_type", "application/octet-stream")
     file_size = getattr(file_obj, "file_size", None)
 
+    if file_size and file_size > MAX_FILE_SIZE:
+        size_mb = file_size / 1024 / 1024
+        await update.message.reply_text(f"File too large ({size_mb:.0f} MB). Max is 20 MB.")
+        return
+
+    msg = await update.message.reply_text("Downloading...")
     temp_path = DOWNLOADS_DIR / file_name
 
     try:
