@@ -250,7 +250,7 @@ async def on_document(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     await handle_file(update, ctx, update.message.document)
 
 
-MAX_FILE_SIZE = 20 * 1024 * 1024  # 20MB Telegram Bot API limit
+MAX_FILE_SIZE = 2 * 1024 * 1024 * 1024  # 2GB with Local Bot API
 
 
 async def handle_file(update: Update, ctx: ContextTypes.DEFAULT_TYPE, file_obj):
@@ -260,8 +260,8 @@ async def handle_file(update: Update, ctx: ContextTypes.DEFAULT_TYPE, file_obj):
     file_size = getattr(file_obj, "file_size", None)
 
     if file_size and file_size > MAX_FILE_SIZE:
-        size_mb = file_size / 1024 / 1024
-        await update.message.reply_text(f"File too large ({size_mb:.0f} MB). Max is 20 MB.")
+        size_gb = file_size / 1024 / 1024 / 1024
+        await update.message.reply_text(f"File too large ({size_gb:.1f} GB). Max is 2 GB.")
         return
 
     msg = await update.message.reply_text("Downloading...")
@@ -337,7 +337,14 @@ def main():
     flask_thread.start()
     log.info(f"Health check: http://localhost:{config.PORT}/health")
 
-    app = Application.builder().token(config.BOT_TOKEN).build()
+    builder = Application.builder().token(config.BOT_TOKEN)
+
+    if config.LOCAL_API_URL:
+        builder = builder.base_url(f"{config.LOCAL_API_URL}/bot")
+        builder = builder.base_file_url(f"{config.LOCAL_API_URL}/file/bot")
+        log.info(f"Using Local Bot API: {config.LOCAL_API_URL}")
+
+    app = builder.build()
 
     app.add_handler(CommandHandler("start", cmd_start))
     app.add_handler(CommandHandler("help", cmd_help))

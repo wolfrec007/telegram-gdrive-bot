@@ -12,6 +12,12 @@ OAUTH_CLIENT_ID = os.environ.get("GOOGLE_OAUTH_CLIENT_ID")
 OAUTH_CLIENT_SECRET = os.environ.get("GOOGLE_OAUTH_CLIENT_SECRET")
 OAUTH_REDIRECT_URI = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:3000/auth/callback")
 
+API_ID = os.environ.get("API_ID", "")
+API_HASH = os.environ.get("API_HASH", "")
+
+LOCAL_API_PORT = int(os.environ.get("LOCAL_API_PORT", "8081"))
+LOCAL_API_URL = os.environ.get("LOCAL_API_URL", f"http://localhost:{LOCAL_API_PORT}")
+
 PORT = int(os.environ.get("PORT", "3000"))
 
 assert BOT_TOKEN, "Missing BOT_TOKEN"
