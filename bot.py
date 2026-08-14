@@ -129,11 +129,50 @@ async def cmd_setfolder(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer()
-
     data = query.data
-    action, folder_id = data.split(":", 1)
     user_id = query.from_user.id
+
+    # Menu-only callbacks (no folder_id)
+    if data in ("pick_folder", "show_status", "show_help", "back_to_menu"):
+        await query.answer()
+        if data == "pick_folder":
+            parent_id = config.GOOGLE_DRIVE_FOLDER_ID or "root"
+            try:
+                folders = drive.list_folders(parent_id)
+                name = _folder_name(parent_id)
+                text = f"**{name}** — choose a subfolder:" if parent_id != "root" else "My Drive — choose a folder:"
+                await query.edit_message_text(text, reply_markup=_folder_keyboard(folders, parent_id))
+            except Exception as e:
+                await query.edit_message_text(f"Failed to list folders: {e}")
+        elif data == "show_status":
+            name = _folder_name(config.GOOGLE_DRIVE_FOLDER_ID)
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ Back", callback_data="back_to_menu")]])
+            await query.edit_message_text(
+                f"Auth mode: {config.AUTH_MODE}\nFolder name: {name}\nFolder ID: `{config.GOOGLE_DRIVE_FOLDER_ID}`",
+                reply_markup=kb,
+            )
+        elif data == "show_help":
+            kb = InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ Back", callback_data="back_to_menu")]])
+            await query.edit_message_text(
+                "How to use:\n\n"
+                "1. Send a video or document\n"
+                "2. It saves to your Google Drive folder\n"
+                "3. You get a link back\n\n"
+                "Use /setfolder to change the target folder.",
+                reply_markup=kb,
+            )
+        elif data == "back_to_menu":
+            kb = InlineKeyboardMarkup([
+                [InlineKeyboardButton("📁 Pick folder", callback_data="pick_folder")],
+                [InlineKeyboardButton("📊 Status", callback_data="show_status")],
+                [InlineKeyboardButton("❓ Help", callback_data="show_help")],
+            ])
+            await query.edit_message_text("Main menu:", reply_markup=kb)
+        return
+
+    # Folder callbacks (have folder_id after colon)
+    await query.answer()
+    action, folder_id = data.split(":", 1)
 
     if action == "browse":
         try:
@@ -167,49 +206,6 @@ async def on_callback(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
         user_parent[user_id] = folder_id
         parent_name = _folder_name(folder_id)
         await query.edit_message_text(f"Send me the name for the new folder inside **{parent_name}**:")
-
-    elif action == "pick_folder":
-        await query.answer()
-        parent_id = config.GOOGLE_DRIVE_FOLDER_ID or "root"
-        try:
-            folders = drive.list_folders(parent_id)
-            name = _folder_name(parent_id)
-            text = f"**{name}** — choose a subfolder:" if parent_id != "root" else "My Drive — choose a folder:"
-            await query.edit_message_text(text, reply_markup=_folder_keyboard(folders, parent_id))
-        except Exception as e:
-            await query.edit_message_text(f"Failed to list folders: {e}")
-
-    elif action == "show_status":
-        await query.answer()
-        name = _folder_name(config.GOOGLE_DRIVE_FOLDER_ID)
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ Back", callback_data="back_to_menu")]])
-        await query.edit_message_text(
-            f"Auth mode: {config.AUTH_MODE}\n"
-            f"Folder name: {name}\n"
-            f"Folder ID: {config.GOOGLE_DRIVE_FOLDER_ID}",
-            reply_markup=kb,
-        )
-
-    elif action == "show_help":
-        await query.answer()
-        kb = InlineKeyboardMarkup([[InlineKeyboardButton("⬅️ Back", callback_data="back_to_menu")]])
-        await query.edit_message_text(
-            "How to use:\n\n"
-            "1. Send a video or document\n"
-            "2. It saves to your Google Drive folder\n"
-            "3. You get a link back\n\n"
-            "Use /setfolder to change the target folder.",
-            reply_markup=kb,
-        )
-
-    elif action == "back_to_menu":
-        await query.answer()
-        kb = InlineKeyboardMarkup([
-            [InlineKeyboardButton("📁 Pick folder", callback_data="pick_folder")],
-            [InlineKeyboardButton("📊 Status", callback_data="show_status")],
-            [InlineKeyboardButton("❓ Help", callback_data="show_help")],
-        ])
-        await query.edit_message_text("Main menu:", reply_markup=kb)
 
 
 # ── Text (folder creation flow) ──────────────────────────────────────────────
