@@ -5,3 +5,5 @@
 - Low tolerance for build/tooling friction — will switch to a simpler stack rather than invest time diagnosing toolchain problems. Confidence: 0.7
 - Prefers interactive/GUI approaches over manual configuration (e.g., wanted an in-Telegram folder browser instead of pasting a Drive folder ID). Confidence: 0.6
 - Delegates deployment decisions to the assistant — says "push it now once you're okay with tests," trusting the assistant to verify correctness and decide when to push rather than reviewing themselves. Confidence: 0.55
+- Price-conscious about hosting — checks whether Railway has a free tier before committing. Prefers free or very low-cost hosting options. Confidence: 0.65
+- Needs explicit step-by-step guidance for cloud service setup (Google Cloud Console, service accounts, folder sharing) — asks basic follow-up questions rather than figuring it out from documentation. Confidence: 0.6

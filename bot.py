@@ -154,14 +154,14 @@ async def on_text(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
 
 
 async def on_video(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    await handle_file(update, update.message.video)
+    await handle_file(update, ctx, update.message.video)
 
 
 async def on_document(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    await handle_file(update, update.message.document)
+    await handle_file(update, ctx, update.message.document)
 
 
-async def handle_file(update: Update, file_obj):
+async def handle_file(update: Update, ctx: ContextTypes.DEFAULT_TYPE, file_obj):
     msg = await update.message.reply_text("Downloading...")
 
     file_id = file_obj.file_id
@@ -172,8 +172,8 @@ async def handle_file(update: Update, file_obj):
     temp_path = DOWNLOADS_DIR / file_name
 
     try:
-        tg_file = await update.message.bot.get_file(file_id)
-        await tg_file.download_to_drive(temp_path.as_posix())
+        tg_file = await ctx.bot.get_file(file_id)
+        await tg_file.download(custom_path=temp_path.as_posix())
 
         size_info = f" ({file_size / 1024 / 1024:.1f} MB)" if file_size else ""
         await msg.edit_text("Uploading to Drive...")
