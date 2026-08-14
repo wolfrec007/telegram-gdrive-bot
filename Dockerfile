@@ -3,7 +3,7 @@ FROM python:3.12-slim
 # Install dependencies for building telegram-bot-api
 RUN apt-get update && apt-get install -y \
     cmake g++ git libssl-dev zlib1g-dev \
-    libreadline-dev libncurses5-dev \
+    libreadline-dev libncurses5-dev gperf \
     && rm -rf /var/lib/apt/lists/*
 
 # Build Telegram Local Bot API Server
