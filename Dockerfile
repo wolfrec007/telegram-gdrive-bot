@@ -36,4 +36,6 @@ COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
 EXPOSE 3000 8081
 
+ENV LOCAL_API_URL=http://localhost:8081
+
 CMD ["supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

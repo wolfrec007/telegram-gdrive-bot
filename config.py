@@ -15,8 +15,7 @@ OAUTH_REDIRECT_URI = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:3000
 API_ID = os.environ.get("API_ID", "")
 API_HASH = os.environ.get("API_HASH", "")
 
-LOCAL_API_PORT = int(os.environ.get("LOCAL_API_PORT", "8081"))
-LOCAL_API_URL = os.environ.get("LOCAL_API_URL", f"http://localhost:{LOCAL_API_PORT}")
+LOCAL_API_URL = os.environ.get("LOCAL_API_URL", "")
 
 PORT = int(os.environ.get("PORT", "3000"))
 
