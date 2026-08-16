@@ -26,8 +26,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy bot code
 COPY . .
 
-# Create downloads directory
-RUN mkdir -p downloads
+# Create downloads directory (bot's temp file staging) and telegram-bot-api's own data dir
+RUN mkdir -p downloads tba_data
 
 # Copy supervisord config
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf

@@ -60,6 +60,22 @@ def upload_file(file_path, file_name, mime_type, folder_id=None):
     return file.get("webViewLink", f"https://drive.google.com/file/d/{file['id']}/view")
 
 
+def overwrite_file(file_id, file_path, mime_type):
+    service = get_drive_service()
+    media = MediaFileUpload(file_path, mimetype=mime_type, resumable=True)
+    file = service.files().update(fileId=file_id, media_body=media, fields="id, webViewLink").execute()
+    return file.get("webViewLink", f"https://drive.google.com/file/d/{file['id']}/view")
+
+
+def find_file_by_name(name, folder_id):
+    service = get_drive_service()
+    safe_name = name.replace("\\", "\\\\").replace("'", "\\'")
+    query = f"name='{safe_name}' and '{folder_id}' in parents and trashed=false"
+    result = service.files().list(q=query, fields="files(id, name)", pageSize=1).execute()
+    files = result.get("files", [])
+    return files[0] if files else None
+
+
 def list_folders(parent_id="root"):
     service = get_drive_service()
     query = f"'{parent_id}' in parents and mimeType='application/vnd.google-apps.folder' and trashed=false"
